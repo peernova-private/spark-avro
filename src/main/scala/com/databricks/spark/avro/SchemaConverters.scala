@@ -393,10 +393,16 @@ object SchemaConverters {
         newFieldBuilder.map().values(valueSchema)
 
       case structType: StructType =>
-        convertStructToAvro(
-          structType,
-          newFieldBuilder.record(structName).namespace(s"$recordNamespace.$structName"),
-          s"$recordNamespace.$structName")
+        if (recordNamespace == null || recordNamespace.isEmpty()) {
+          convertStructToAvro(
+            structType,
+            newFieldBuilder.record(structName), "")
+        } else {
+          convertStructToAvro(
+            structType,
+            newFieldBuilder.record(structName).namespace(s"$recordNamespace.$structName"),
+            s"$recordNamespace.$structName")
+        }
 
       case other => throw new IncompatibleSchemaException(s"Unexpected type $dataType.")
     }
